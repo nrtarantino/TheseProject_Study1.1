@@ -768,7 +768,7 @@
             setTimeout(() => {
                 transitionDiv.classList.add('hidden');
                 // Start next block
-                const nextBlockNumber = blocksToRun[currentBlockIndex];
+                const nextBlockNumber = blocksToRun[currentBlockIndex + 1];
                 startBlock(nextBlockNumber);
             }, 3000);
         }
