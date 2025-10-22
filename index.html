@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Go/No-Go Visual Search Task</title>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- Email sending removed: mobile users see a message asking them to use a desktop/laptop -->
     <style>
         body {
             font-family: serif;
@@ -126,14 +126,8 @@
         </div>
         
         <div id="email-gate" class="trial-screen instructions hidden">
-            <h2>Email Verification Required</h2>
-            <p>Please enter your email address to receive a secure link to continue the experiment on a desktop computer.</p>
-            <div style="margin: 20px 0;">
-                <input type="email" id="email-input" placeholder="your.email@example.com" 
-                       style="padding: 10px; width: 300px; border: 1px solid #333; border-radius: 0px; font-size: 16px; font-family: serif;">
-            </div>
-            <button id="email-send-btn" class="button">Send Link</button>
-            <div id="email-status" style="margin-top: 15px; font-size: 14px;"></div>
+            <h2>Unsupported device</h2>
+            <p>This study can only be completed on a desktop or laptop not with a phone or tablet. Please restart the SONA study on your desktop or laptop.</p>
         </div>
     </div>
     
@@ -141,57 +135,14 @@
     <button id="small-fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
 
     <script>
-        // EmailJS initialization and functions
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize EmailJS with your public key
-            emailjs.init({ publicKey: 'an53jOo6n4WB45aL9' });
-        });
-
-        function buildResumeUrl() {
-            const url = new URL(window.location.href);
-            const keep = ['id', 'ResponseID', 'PID', 'pid'];
-            const out = new URL(url.origin + url.pathname);
-            keep.forEach(k => {
-                const v = url.searchParams.get(k);
-                if (v) out.searchParams.set(k, v);
-            });
-            out.searchParams.set('resume', 'email');
-            return out.toString();
-        }
-
+        // Show a simple gate for unsupported devices (mobile/tablet)
         function showEmailGate() {
+            // Hide other screens and show the device-gate message
             ['start-screen','instructions','trial-screen','end-screen'].forEach(id =>
                 document.getElementById(id)?.classList.add('hidden')
             );
-
             const gate = document.getElementById('email-gate');
             gate.classList.remove('hidden');
-
-            const sendBtn = document.getElementById('email-send-btn');
-            const emailInput = document.getElementById('email-input');
-            const status = document.getElementById('email-status');
-            const resumeUrl = buildResumeUrl();
-
-            sendBtn.onclick = async () => {
-                const email = (emailInput.value || '').trim();
-                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    status.textContent = 'Please enter a valid email.';
-                    return;
-                }
-
-                status.textContent = 'Sending…';
-
-                try {
-                    const result = await emailjs.send('service_p8yacoc', 'template_lr85t48', {
-                        email: email,
-                        resume_url: resumeUrl
-                    });
-                    
-                    status.textContent = '✅ Link sent! Please open your email on a desktop to start.';
-                } catch (e) {
-                    status.textContent = `⚠️ Could not send email. Error: ${e.text || e.message || 'Unknown error'}`;
-                }
-            };
         }
 
         // Experiment data
