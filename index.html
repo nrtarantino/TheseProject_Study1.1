@@ -13,6 +13,10 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        html, body {
+            overflow: hidden !important;
         }
         #jspsych-content {
             width: 1024px;
@@ -760,6 +764,7 @@
                 transitionDiv.style.padding = '50px';
                 document.getElementById('jspsych-content').appendChild(transitionDiv);
             }
+            transitionDiv.classList.add('hidden');
             const n = currentBlockIndex + 1;
             transitionDiv.innerHTML = `<h2>Task ${n} of ${totalBlocks} complete.</h2><p>Moving to Task ${n+1}.</p>`;
             transitionDiv.classList.remove('hidden');
