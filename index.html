@@ -198,7 +198,7 @@
                 targetGroup: 'bars_neg',
                 name: 'id',
                 instructionsTitle: 'Task Instructions',
-                instructionsBody: 'Press SPACE when any of the 4 graphs display a decreasing slope. If none are decreasing, refrain from responding.'
+                instructionsBody: 'Press SPACE when any of the 4 graphs display a DECREASING slope. If none are DECREASING, refrain from responding.'
             },
             subblock_bars_pos: {
                 id: 'subblock_bars_pos',
@@ -206,7 +206,7 @@
                 targetGroup: 'bars_pos',
                 name: 'Sub-block B',
                 instructionsTitle: 'Task Instructions', 
-                instructionsBody: 'Press SPACE when any of the 4 graphs display an increasing slope. If none are increasing, refrain from responding.'
+                instructionsBody: 'Press SPACE when any of the 4 graphs display an INCREASING slope. If none are INCREASING, refrain from responding.'
             },
             subblock_scatter_neg: {
                 id: 'subblock_scatter_neg',
@@ -214,7 +214,7 @@
                 targetGroup: 'scatter_neg',
                 name: 'Sub-block C',
                 instructionsTitle: 'Task Instructions',
-                instructionsBody: 'Press SPACE when any of the 4 graphs display a decreasing slope. If none are decreasing, refrain from responding.'
+                instructionsBody: 'Press SPACE when any of the 4 graphs display a DECREASING slope. If none are DECREASING, refrain from responding.'
             },
             subblock_scatter_pos: {
                 id: 'subblock_scatter_pos',
@@ -222,7 +222,7 @@
                 targetGroup: 'scatter_pos',
                 name: 'Sub-block D',
                 instructionsTitle: 'Task Instructions',
-                instructionsBody: 'Press SPACE when any of the 4 graphs display an increasing slope. If none are increasing, refrain from responding.'
+                instructionsBody: 'Press SPACE when any of the 4 graphs display an INCREASING slope. If none are INCREASING, refrain from responding.'
             },
             subblock_lines_neg: {
                 id: 'subblock_lines_neg',
@@ -230,7 +230,7 @@
                 targetGroup: 'lines_neg',
                 name: 'Sub-block E',
                 instructionsTitle: 'Task Instructions',
-                instructionsBody: 'Press SPACE when any of the 4 graphs display a decreasing slope. If none are decreasing, refrain from responding.'
+                instructionsBody: 'Press SPACE when any of the 4 graphs display a DECREASING slope. If none are DECREASING, refrain from responding.'
             },
             subblock_lines_pos: {
                 id: 'subblock_lines_pos',
@@ -238,7 +238,7 @@
                 targetGroup: 'lines_pos',
                 name: 'Sub-block F',
                 instructionsTitle: 'Task Instructions',
-                instructionsBody: 'Press SPACE when any of the 4 graphs display an increasing slope. If none are increasing, refrain from responding.'
+                instructionsBody: 'Press SPACE when any of the 4 graphs display an INCREASING slope. If none are INCREASING, refrain from responding.'
             }
         };
         
@@ -314,13 +314,13 @@
             const existingStimuli = container.querySelectorAll('.stimulus');
             existingStimuli.forEach(stimulus => stimulus.remove());
             
-            // Show reminder with modified instructions
+            // Show reminder with updated heading and instructions
             const instructionsDiv = document.getElementById('instructions');
             const subBlockInfo = subBlocks[subBlockId];
             
             instructionsDiv.innerHTML = `
-                <h2>${subBlockInfo.instructionsTitle}</h2>
-                <p>Recall you ${subBlockInfo.instructionsBody}</p>
+                <h2>Remember.</h2>
+                <p>${subBlockInfo.instructionsBody}</p>
                 <button class="button" onclick="continueAfterReminder()">Continue</button>
             `;
             
