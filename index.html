@@ -726,6 +726,22 @@
             
             // Initial button state
             updateSmallFullscreenButton();
+            
+            // After setting up the start screen, show ID info for debugging
+            const startScreen = document.getElementById('start-screen');
+            let idInfoDiv = document.getElementById('id-info');
+            if (!idInfoDiv) {
+                idInfoDiv = document.createElement('div');
+                idInfoDiv.id = 'id-info';
+                idInfoDiv.style.marginTop = '20px';
+                idInfoDiv.style.fontSize = '16px';
+                idInfoDiv.style.color = '#333';
+                startScreen.appendChild(idInfoDiv);
+            }
+            idInfoDiv.innerHTML =
+                `<strong>Participant ID:</strong> ${participantIdFromUrl || '<span style=\"color:red\">(missing)</span>'}<br>` +
+                `<strong>SONA ID:</strong> ${sonaId || '<span style=\"color:red\">(missing)</span>'}<br>` +
+                `<strong>Qualtrics ResponseID:</strong> ${qualtricsResponseId || '<span style=\"color:red\">(missing)</span>'}`;
         });
 
         function startExperiment() {
