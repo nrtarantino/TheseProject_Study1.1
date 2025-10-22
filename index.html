@@ -122,7 +122,7 @@
         
         <div id="end-screen" class="trial-screen end-screen hidden">
             <h2>Experiment Almost Complete</h2>
-            <p>Redirecting to Qualtrics survey to complete a 2-3 minute questionnaire to recieve credit<span id="loading-dots">...</span></p>
+            <p>Redirecting to the Qualtrics survey for a 2-3 minute questionnaire you can complete to receive credit<span id="loading-dots">...</span></p>
         </div>
         
         <div id="email-gate" class="trial-screen instructions hidden">
@@ -739,26 +739,58 @@
             startBlock(firstBlockNumber);
         }
         
+        // Show block transition screen for 3 seconds
+        function showBlockTransitionScreen(currentBlockIndex, totalBlocks) {
+            // Hide all screens
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('trial-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('instructions').classList.add('hidden');
+
+            // Create or reuse a transition div
+            let transitionDiv = document.getElementById('block-transition');
+            if (!transitionDiv) {
+                transitionDiv = document.createElement('div');
+                transitionDiv.id = 'block-transition';
+                transitionDiv.className = 'trial-screen instructions';
+                transitionDiv.style.display = 'flex';
+                transitionDiv.style.flexDirection = 'column';
+                transitionDiv.style.justifyContent = 'center';
+                transitionDiv.style.alignItems = 'center';
+                transitionDiv.style.padding = '50px';
+                document.getElementById('jspsych-content').appendChild(transitionDiv);
+            }
+            const n = currentBlockIndex + 1;
+            transitionDiv.innerHTML = `<h2>Task ${n} of ${totalBlocks} complete.</h2><p>Moving to Task ${n+1}.</p>`;
+            transitionDiv.classList.remove('hidden');
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                transitionDiv.classList.add('hidden');
+                // Start next block
+                const nextBlockNumber = blocksToRun[currentBlockIndex];
+                startBlock(nextBlockNumber);
+            }, 3000);
+        }
+
         function runTrial() {
             const currentBlockNumber = blocksToRun[experimentData.currentBlockIndex];
             const currentBlock = blocks.find(b => b.id === currentBlockNumber);
             const totalTrialsPerBlock = currentBlock.trialsPerSubBlock * currentBlock.totalSubBlockRuns;
-            
+
             // Check if current block is finished
             if (experimentData.currentTrial >= totalTrialsPerBlock) {
                 // Move to next block
                 experimentData.currentBlockIndex++;
-                
+
                 // Check if all blocks are finished
                 if (experimentData.currentBlockIndex >= blocksToRun.length) {
                     endExperiment();
                     return;
                 }
-                
-                // Start next block
-                const nextBlockNumber = blocksToRun[experimentData.currentBlockIndex];
-                experimentData.currentTrial = 0; // Reset trial counter for new block
-                startBlock(nextBlockNumber);
+
+                // Show block transition screen before starting next block
+                showBlockTransitionScreen(experimentData.currentBlockIndex - 1, blocksToRun.length);
                 return;
             }
             
