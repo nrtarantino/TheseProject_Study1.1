@@ -743,7 +743,7 @@
             }
             transitionDiv.classList.add('hidden');
             const n = currentBlockIndex + 1;
-            transitionDiv.innerHTML = `<h2>Task ${n} of ${totalBlocks} complete.</h2><p>Moving to Task ${n+1}.</p>`;
+            transitionDiv.innerHTML = `<h2>Task ${n} of ${totalBlocks} complete</h2><p>Moving to Task ${n+1}</p>`;
             transitionDiv.classList.remove('hidden');
 
             // Hide after 3 seconds
@@ -752,7 +752,7 @@
                 // Start next block
                 const nextBlockNumber = blocksToRun[currentBlockIndex + 1];
                 startBlock(nextBlockNumber);
-            }, 3000);
+            }, 2000);
         }
 
         function runTrial() {
