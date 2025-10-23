@@ -417,26 +417,18 @@
         function updateSmallFullscreenButton() {
             const smallBtn = document.getElementById('small-fullscreen-btn');
             const body = document.body;
-            
             // Sync CSS class with actual fullscreen state
             if (isFullscreen()) {
                 body.classList.add('fullscreen-mode');
             } else {
                 body.classList.remove('fullscreen-mode');
             }
-            
             // Show/hide button based on actual fullscreen state
             if (isFullscreen()) {
                 smallBtn.style.display = 'none';
             } else {
                 smallBtn.style.display = 'block';
             }
-            
-            console.log('Button visibility check:', {
-                cssClass: body.classList.contains('fullscreen-mode'),
-                actualFullscreen: isFullscreen(),
-                buttonVisible: smallBtn.style.display !== 'none'
-            });
         }
 
         // Fullscreen toggle function
@@ -532,24 +524,14 @@
         // Load stimulus pools and preload all images (GitHub Pages compatible)
         async function loadStimulusPools() {
             try {
-                // Initialize stimulus pools with embedded file lists
                 initializeStimulusPools();
-                
-                console.log('Loaded stimuli pools:', stimulusPools);
-                
-                // Check if any stimuli were loaded
                 const totalStimuli = Object.values(stimulusPools).reduce((sum, pool) => sum + pool.length, 0);
                 if (totalStimuli === 0) {
-                    console.log('No PNG stimuli found, using fallback circles');
                     return false;
                 }
-                
-                // Preload all images
                 await preloadAllImages();
-                
                 return true;
             } catch (error) {
-                console.log('Error loading stimuli, using fallback circles:', error);
                 return false;
             }
         }
@@ -559,8 +541,6 @@
             const allImagePaths = Object.values(stimulusPools).flat();
             const totalImages = allImagePaths.length;
             let loadedCount = 0;
-            
-            console.log(`Preloading ${totalImages} images...`);
             updateLoadingProgress(0, totalImages);
             
             const preloadPromises = allImagePaths.map(imagePath => {
@@ -583,13 +563,11 @@
             });
             
             await Promise.all(preloadPromises);
-            console.log(`Preloaded ${Object.keys(preloadedImages).length} images successfully`);
         }
         
         // Update loading progress indicator (console only)
         function updateLoadingProgress(loaded, total) {
             const percentage = Math.round((loaded / total) * 100);
-            console.log(`Loading images: ${loaded}/${total} (${percentage}%)`);
         }
         
         // Get random stimulus from specified group
@@ -693,7 +671,6 @@
             deviceType = detectDevice();
             
             if (participantIdFromUrl) {
-                console.log('Primary participant ID loaded from URL:', participantIdFromUrl);
                 if (sonaId) console.log('SONA ID:', sonaId);
                 if (qualtricsResponseId) console.log('Qualtrics ResponseID:', qualtricsResponseId);
             } else {
@@ -726,22 +703,6 @@
             
             // Initial button state
             updateSmallFullscreenButton();
-            
-            // After setting up the start screen, show ID info for debugging
-            const startScreen = document.getElementById('start-screen');
-            let idInfoDiv = document.getElementById('id-info');
-            if (!idInfoDiv) {
-                idInfoDiv = document.createElement('div');
-                idInfoDiv.id = 'id-info';
-                idInfoDiv.style.marginTop = '20px';
-                idInfoDiv.style.fontSize = '16px';
-                idInfoDiv.style.color = '#333';
-                startScreen.appendChild(idInfoDiv);
-            }
-            idInfoDiv.innerHTML =
-                `<strong>Participant ID:</strong> ${participantIdFromUrl || '<span style=\"color:red\">(missing)</span>'}<br>` +
-                `<strong>SONA ID:</strong> ${sonaId || '<span style=\"color:red\">(missing)</span>'}<br>` +
-                `<strong>Qualtrics ResponseID:</strong> ${qualtricsResponseId || '<span style=\"color:red\">(missing)</span>'}`;
         });
 
         function startExperiment() {
@@ -983,11 +944,6 @@
             const isGoTrial = trial.trialType === 'go';
             const wasSpace = response === 'space';
             const accuracy = isGoTrial ? wasSpace : !wasSpace;
-            
-            // Log fullscreen status for debugging
-            console.log('Trial fullscreen status:', isFullscreen());
-            
-            // Update small fullscreen button visibility on every trial
             updateSmallFullscreenButton();
             
             // Update accuracy tracking
@@ -1041,21 +997,10 @@
        async function endExperiment() {
     document.getElementById('trial-screen').classList.add('hidden');
     document.getElementById('end-screen').classList.remove('hidden');
-
-    // Start animated dots loading
     startLoadingDots();
-
     experimentData.endTime = new Date().toISOString();
-
-    // Local backup (optional but handy for debugging)
     localStorage.setItem('experiment_data', JSON.stringify(experimentData));
-    console.log('Experiment completed. Data saved locally:', experimentData);
-
-    // Send full hierarchical data to DataPipe
     const dataPipeResult = await sendToDataPipe(experimentData);
-    console.log('DataPipe result:', dataPipeResult);
-
-    // Redirect back to Qualtrics
     finishAndReturn();
 }
 
