@@ -180,6 +180,26 @@
             }
             return shuffled;
         }
+
+        // Build a 60-trial schedule with 32 balanced go trials and 28 no-go trials
+        function createBalancedSubBlockSchedule() {
+            const quadrants = ['upper_left', 'upper_right', 'lower_left', 'lower_right'];
+            const schedule = [];
+
+            // Add eight go trials for each quadrant
+            quadrants.forEach(quadrant => {
+                for (let i = 0; i < 8; i++) {
+                    schedule.push({ isGoTrial: true, targetQuadrant: quadrant });
+                }
+            });
+
+            // Add 28 no-go trials
+            for (let i = 0; i < 28; i++) {
+                schedule.push({ isGoTrial: false, targetQuadrant: null });
+            }
+
+            return shuffleArray(schedule);
+        }
         
         // Randomize the block order when the page loads
         blocksToRun = shuffleArray(blocksToRun);
@@ -382,6 +402,13 @@
         function startSubBlock(blockNumber, subBlockId) {
             document.getElementById('instructions').classList.add('hidden');
             document.getElementById('trial-screen').classList.remove('hidden');
+            const currentBlock = blocks.find(b => b.id === blockNumber);
+            if (currentBlock) {
+                currentBlock.activeSchedule = createBalancedSubBlockSchedule();
+                currentBlock.activeScheduleIndex = 0;
+                currentBlock.activeScheduleSubBlockId = subBlockId;
+            }
+            experimentData.currentSubBlockTrial = 0;
             runTrial();
         }
         
@@ -780,7 +807,7 @@
             if (experimentData.currentSubBlockTrial >= currentBlock.trialsPerSubBlock) {
                 // Move to next sub-block run
                 currentBlock.currentSubBlockRun++;
-                
+
                 // Check if we've completed all sub-block runs
                 if (currentBlock.currentSubBlockRun >= currentBlock.totalSubBlockRuns) {
                     // This shouldn't happen as block should end, but safety check
@@ -797,10 +824,39 @@
                 showInstructionsForSubBlock(currentBlockNumber, newSubBlockId);
                 return; // Exit runTrial, will resume when sub-block instructions are dismissed
             }
-            
-            // Generate random trial (50/50 go/no-go)
-            const isGoTrial = Math.random() < 0.5;
-            const trial = generateTrial(isGoTrial, experimentData.currentTrial + 1);
+
+            const currentSubBlockOrderIndex = currentBlock.subBlockOrder[currentBlock.currentSubBlockIndex];
+            const currentSubBlockId = currentBlock.subBlocks[currentSubBlockOrderIndex];
+
+            if (currentBlock.activeScheduleSubBlockId !== currentSubBlockId || !Array.isArray(currentBlock.activeSchedule)) {
+                currentBlock.activeSchedule = createBalancedSubBlockSchedule();
+                currentBlock.activeScheduleIndex = 0;
+                currentBlock.activeScheduleSubBlockId = currentSubBlockId;
+            }
+
+            const activeSchedule = currentBlock.activeSchedule || [];
+            const scheduleIndex = currentBlock.activeScheduleIndex || 0;
+
+            if (scheduleIndex >= activeSchedule.length) {
+                console.warn('Schedule exhausted before sub-block completion. Regenerating schedule.');
+                currentBlock.activeSchedule = createBalancedSubBlockSchedule();
+                currentBlock.activeScheduleIndex = 0;
+                currentBlock.activeScheduleSubBlockId = currentSubBlockId;
+            }
+
+            const scheduleEntry = currentBlock.activeSchedule[currentBlock.activeScheduleIndex];
+            if (!scheduleEntry) {
+                console.error('No schedule entry available for trial generation.');
+                return;
+            }
+
+            currentBlock.activeScheduleIndex++;
+
+            const trial = generateTrial(
+                scheduleEntry.isGoTrial,
+                experimentData.currentTrial + 1,
+                scheduleEntry.targetQuadrant
+            );
             
             // Show blank screen
             document.getElementById('stimuli-container').style.display = 'none';
@@ -811,9 +867,9 @@
             }, settings.blankDuration);
         }
         
-        function generateTrial(isGoTrial, trialNumber) {
+        function generateTrial(isGoTrial, trialNumber, forcedQuadrant = null) {
             const quadrants = ['upper_left', 'upper_right', 'lower_left', 'lower_right'];
-            const targetQuadrant = isGoTrial ? quadrants[Math.floor(Math.random() * quadrants.length)] : null;
+            const targetQuadrant = isGoTrial ? (forcedQuadrant || quadrants[Math.floor(Math.random() * quadrants.length)]) : null;
             
             // Get current block and sub-block configuration
             const currentBlockNumber = blocksToRun[experimentData.currentBlockIndex];
