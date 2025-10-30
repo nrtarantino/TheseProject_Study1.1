@@ -896,6 +896,13 @@
                 };
             });
             
+            // Find the target stimulus file name (for go trials only)
+            let targetStimulusFile = null;
+            if (isGoTrial) {
+                const targetStimulus = stimuli.find(s => s.isTarget);
+                targetStimulusFile = targetStimulus ? targetStimulus.stimulusFile : null;
+            }
+            
             return {
                 trialId: `${isGoTrial ? 'go' : 'no_go'}_trial_${trialNumber}`,
                 trialType: isGoTrial ? 'go' : 'no_go',
@@ -903,6 +910,7 @@
                 distractorGroup: distractorGroup,
                 targetGroup: targetGroup,
                 targetQuadrant: targetQuadrant,
+                targetStimulusFile: targetStimulusFile,
                 currentSubBlockId: currentSubBlockId,
                 subBlockTrial: experimentData.currentSubBlockTrial + 1,
                 startTime: new Date().toISOString()
@@ -1026,6 +1034,7 @@
                 responseTime: responseTime,                // ms from stimulus onset
                 accuracy: accuracy,                        // boolean
                 targetQuadrant: trial.targetQuadrant,      // quadrant or null
+                targetStimulusFile: trial.targetStimulusFile,  // file name of target stimulus
                 subBlockId: trial.currentSubBlockId,       // which sub-block this trial belongs to
                 subBlockTrial: trial.subBlockTrial,        // trial number within sub-block
                 distractorGroup: trial.distractorGroup,   // stimulus group used for distractors
@@ -1071,7 +1080,7 @@
             const csvRows = [];
             
             // Add header row
-            csvRows.push('participantId,sonaId,qualtricsResponseId,deviceType,startTime,endTime,resume,blockId,subBlockId,trialType,responseTime,accuracy,targetQuadrant,subBlockTrial,distractorGroup,targetGroup,isFullscreen');
+            csvRows.push('participantId,sonaId,qualtricsResponseId,deviceType,startTime,endTime,resume,blockId,subBlockId,trialType,responseTime,accuracy,targetQuadrant,targetStimulusFile,subBlockTrial,distractorGroup,targetGroup,isFullscreen');
             
             // Add data rows
             data.blocks.forEach(block => {
@@ -1090,6 +1099,7 @@
                         trial.responseTime || '',
                         trial.accuracy || '',
                         trial.targetQuadrant || '',
+                        trial.targetStimulusFile || '',
                         trial.subBlockTrial || '',
                         trial.distractorGroup || '',
                         trial.targetGroup || '',
